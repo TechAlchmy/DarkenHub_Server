@@ -39,7 +39,7 @@ export const googleLogin = (
     token,
     user: req.user,
   });
-  let redirectUrl = "";
+  let redirectUrl = "http://localhost:5173";
   if (req.query.state) {
     try {
       const stateData = JSON.parse(
@@ -55,8 +55,11 @@ export const googleLogin = (
 
   res.send(`
     <script>
-      window.opener.postMessage(${message},'${redirectUrl}');
-      window.close();
+      if (window.opener) {
+          window.opener.postMessage(${message}, '*'); // Use '*' for testing
+      } else {
+          console.error('Opener window is not available.');
+      }
     </script>
   `);
 };
