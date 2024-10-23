@@ -6,6 +6,9 @@ import dotenv from "dotenv";
 import passport from "passport";
 import cookieParser from "cookie-parser";
 import session from "express-session";
+import { Server, Socket } from "socket.io"
+import Chat from "./models/Chat"
+import { ChatMessage } from "types/ChatMessage";
 dotenv.config();
 
 import authRoutes from "./routes/authRoutes";
@@ -39,6 +42,46 @@ app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 
 const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
+
+// Listen for incoming connections
+io.on('connection', (socket: Socket) => {
+  console.log('A user connected:', socket.id);
+
+  // Send chat history when a new user connects
+  Chat.find().sort({ timestamp: 1 }).then(messages => {
+    socket.emit('chatHistory', messages);
+  });
+
+  // Listen for chat messages
+  socket.on('chatMessage', (message: string) => {
+    console.log('enter');
+    const newMessage: ChatMessage = {
+      message,
+      sender: socket.id, // You can use a user ID or username instead of socket.id
+      timestamp: new Date(),
+    };
+
+    const chat = new Chat(newMessage);
+
+    chat.save()
+      .then(() => {
+        // Broadcast message to all connected clients
+        io.emit('chatMessage', newMessage);
+      })
+      .catch(err => console.error('Error saving message:', err));
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+  });
+});
 
 const port = process.env.PORT || 5500;
 server.listen(port, () => {

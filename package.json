@@ -49,6 +49,7 @@
     "mongoose": "^8.7.1",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
-    "passport-steam": "^1.0.18"
+    "passport-steam": "^1.0.18",
+    "socket.io": "^4.8.0"
   }
 }
