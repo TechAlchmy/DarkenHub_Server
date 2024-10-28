@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 interface IMessage extends mongoose.Document {
+  roomId: string,
   userId: string;
   message: string;
   timestamp: Date;
@@ -9,6 +10,7 @@ interface IMessage extends mongoose.Document {
 const messageSchema = new mongoose.Schema({
   userId: String,
   message: String,
+  roomId: String,
   timestamp: { type: Date, default: Date.now },
 });;
 

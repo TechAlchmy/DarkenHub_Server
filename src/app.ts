@@ -10,7 +10,7 @@ import { Server, Socket } from "socket.io"
 import Message from "./models/Chat"
 import { ChatMessage } from "types/ChatMessage";
 dotenv.config();
-
+import cron from 'node-cron';
 import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
 import connectDB from "./config/db";
@@ -50,53 +50,27 @@ const io = new Server(server, {
   }
 });
 
-// // Listen for incoming connections
-// io.on('connection', (socket: Socket) => {
-//   console.log('A user connected:', socket.id);
-
-//   // Send chat history when a new user connects
-//   Chat.find().sort({ timestamp: 1 }).then(messages => {
-//     socket.emit('chatHistory', messages);
-//   });
-
-//   // Listen for chat messages
-//   socket.on('chatMessage', (message: string) => {
-//     console.log('enter');
-//     const newMessage: ChatMessage = {
-//       message,
-//       sender: socket.id, // You can use a user ID or username instead of socket.id
-//       timestamp: new Date(),
-//     };
-
-//     const chat = new Chat(newMessage);
-
-//     chat.save()
-//       .then(() => {
-//         // Broadcast message to all connected clients
-//         io.emit('chatMessage', newMessage);
-//       })
-//       .catch(err => console.error('Error saving message:', err));
-//   });
-
-//   socket.on('disconnect', () => {
-//     console.log('User disconnected:', socket.id);
-//   });
-// });
-
-// Handle Socket Connections
 io.on('connection', (socket) => {
   console.log('A user connected');
 
-  // Send existing messages to the new user
-  Message.find().then((messages) => {
-    socket.emit('chat history', messages);
+  // Join a specific room
+  socket.on('joinRoom', (roomId) => {
+    socket.join(roomId);
+    console.log(`User joined room: ${roomId}`);
+
+    // Send existing messages in the room to the new user
+    Message.find({ roomId: roomId }).then((messages) => {
+      console.log(messages);
+      socket.emit('chat history', messages);
+    });
   });
 
   // Listen for incoming messages
-  socket.on('chat message', (msg: any) => {
+  socket.on('chat message', (msg) => {
+    console.log(msg);
     const newMessage = new Message(msg);
     newMessage.save().then(() => {
-      io.emit('chat message', msg);
+      io.to(msg.roomId).emit('chat message', msg);
     });
   });
 
@@ -104,6 +78,14 @@ io.on('connection', (socket) => {
     console.log('User disconnected');
   });
 });
+
+cron.schedule('0 0 * * *', () => {
+  Message.deleteMany({}, (err: any) => {
+    if (err) console.error(err);
+    else console.log('Chat history cleared');
+  });
+});
+
 
 const port = process.env.PORT || 5500;
 server.listen(port, () => {
