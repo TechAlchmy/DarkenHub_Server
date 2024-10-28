@@ -1,15 +1,15 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-interface ChatMessage {
+interface IMessage extends mongoose.Document {
+  userId: string;
   message: string;
-  sender: string;
   timestamp: Date;
 }
 
-const ChatSchema: Schema = new Schema({
-  message: { type: String, required: true },
-  sender: { type: String, required: true },
+const messageSchema = new mongoose.Schema({
+  userId: String,
+  message: String,
   timestamp: { type: Date, default: Date.now },
-});
+});;
 
-export default mongoose.model<ChatMessage & Document>('Chat', ChatSchema);
+export default mongoose.model<IMessage>('Message', messageSchema);

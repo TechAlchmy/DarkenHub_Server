@@ -7,7 +7,7 @@ import passport from "passport";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import { Server, Socket } from "socket.io"
-import Chat from "./models/Chat"
+import Message from "./models/Chat"
 import { ChatMessage } from "types/ChatMessage";
 dotenv.config();
 
@@ -50,36 +50,58 @@ const io = new Server(server, {
   }
 });
 
-// Listen for incoming connections
-io.on('connection', (socket: Socket) => {
-  console.log('A user connected:', socket.id);
+// // Listen for incoming connections
+// io.on('connection', (socket: Socket) => {
+//   console.log('A user connected:', socket.id);
 
-  // Send chat history when a new user connects
-  Chat.find().sort({ timestamp: 1 }).then(messages => {
-    socket.emit('chatHistory', messages);
+//   // Send chat history when a new user connects
+//   Chat.find().sort({ timestamp: 1 }).then(messages => {
+//     socket.emit('chatHistory', messages);
+//   });
+
+//   // Listen for chat messages
+//   socket.on('chatMessage', (message: string) => {
+//     console.log('enter');
+//     const newMessage: ChatMessage = {
+//       message,
+//       sender: socket.id, // You can use a user ID or username instead of socket.id
+//       timestamp: new Date(),
+//     };
+
+//     const chat = new Chat(newMessage);
+
+//     chat.save()
+//       .then(() => {
+//         // Broadcast message to all connected clients
+//         io.emit('chatMessage', newMessage);
+//       })
+//       .catch(err => console.error('Error saving message:', err));
+//   });
+
+//   socket.on('disconnect', () => {
+//     console.log('User disconnected:', socket.id);
+//   });
+// });
+
+// Handle Socket Connections
+io.on('connection', (socket) => {
+  console.log('A user connected');
+
+  // Send existing messages to the new user
+  Message.find().then((messages) => {
+    socket.emit('chat history', messages);
   });
 
-  // Listen for chat messages
-  socket.on('chatMessage', (message: string) => {
-    console.log('enter');
-    const newMessage: ChatMessage = {
-      message,
-      sender: socket.id, // You can use a user ID or username instead of socket.id
-      timestamp: new Date(),
-    };
-
-    const chat = new Chat(newMessage);
-
-    chat.save()
-      .then(() => {
-        // Broadcast message to all connected clients
-        io.emit('chatMessage', newMessage);
-      })
-      .catch(err => console.error('Error saving message:', err));
+  // Listen for incoming messages
+  socket.on('chat message', (msg: any) => {
+    const newMessage = new Message(msg);
+    newMessage.save().then(() => {
+      io.emit('chat message', msg);
+    });
   });
 
   socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
+    console.log('User disconnected');
   });
 });
 
