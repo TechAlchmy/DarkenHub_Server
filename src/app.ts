@@ -13,7 +13,9 @@ dotenv.config();
 import cron from 'node-cron';
 import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
+import dota2Routes from "./routes/dota2Routes";
 import connectDB from "./config/db";
+
 import "./config/passport";
 
 connectDB();
@@ -40,6 +42,7 @@ app.use(passport.session());
 // Routes
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
+app.use("/dota2", dota2Routes);
 
 const server = http.createServer(app);
 
@@ -60,14 +63,12 @@ io.on('connection', (socket) => {
 
     // Send existing messages in the room to the new user
     Message.find({ roomId: roomId }).then((messages) => {
-      console.log(messages);
       socket.emit('chat history', messages);
     });
   });
 
   // Listen for incoming messages
   socket.on('chat message', (msg) => {
-    console.log(msg);
     const newMessage = new Message(msg);
     newMessage.save().then(() => {
       io.to(msg.roomId).emit('chat message', msg);
