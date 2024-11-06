@@ -3,6 +3,7 @@ import { IUser } from "../models/schemas/UserSchema";
 import { User } from "../models/User";
 import axios from "axios";
 
+
 interface Hero {
     id: number;
     name: string;
@@ -11,7 +12,11 @@ interface Hero {
 }
 
 // Function to fetch heroes
+
 async function getHeroListFromAPI(): Promise<Hero[]> {
+    const heroDataJson = await fetch('https://raw.githubusercontent.com/joshuaduffy/dota2api/master/dota2api/ref/heroes.json')
+    let heroJson = await heroDataJson.json();
+    let heroData = heroJson.heroes;
     const BASE_URL = 'https://api.opendota.com/api/heroes';
     try {
         const response = await axios.get(BASE_URL);
@@ -21,7 +26,8 @@ async function getHeroListFromAPI(): Promise<Hero[]> {
             id: hero.id,
             name: hero.localized_name,
             type: hero.primary_attr,
-            img: `https://cdn.dota2.com/apps/dota2/images/heroes/${hero.localized_name.toLowerCase().replace(/\s/g, '_').replace(/-/g, '')}_vert.jpg`
+            img1: heroData.filter((item:any) => item.id == hero.id)[0]?.url_vertical_portrait,
+            img2: `https://cdn.akamai.steamstatic.com/apps/dota2/images/dota_react/heroes/${hero.localized_name.toLowerCase().replace(/\s/g, '_').replace(/-/g, '')}.png`,
         }));
     } catch (error) {
         console.error('Error fetching heroes:', error);
