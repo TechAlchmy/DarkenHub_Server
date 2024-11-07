@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import sendToken from "../utils/sendToken";
 import { User } from "../models/User";
 import { IUser } from "../models/schemas/UserSchema";
+require('dotenv').config();
 
 export const registerUser = async (
   req: Request,
@@ -64,6 +65,20 @@ export const googleLogin = (
   `);
 };
 
-export const steamLogin = (req: Request, res: Response, next: NextFunction) => {
-  sendToken(req.user as IUser, 200, res); // Send JWT to frontend
+
+
+export const steamLogin = async (req: Request, res: Response, next: NextFunction) => {
+  const userData = req.body;
+
+  const { steamID } = req.body;
+  let user = await User.findOne({ steamID: steamID});
+  if (!user) {
+    // Create a new user if they don't exist
+    user = await User.create({
+      steamId: steamID,
+      // Add any additional fields you need
+    });
+  }
+
+  sendToken(user, 200, res); // Send JWT to frontend
 };

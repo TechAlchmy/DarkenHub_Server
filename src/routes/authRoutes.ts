@@ -5,9 +5,9 @@ import {
   steamLogin,
 } from "../controllers/authController";
 import express, { Request, Response, NextFunction } from "express";
+const OpenID = require('openid').OpenID;
 import passport from "passport";
 import { OAuth2Client } from "google-auth-library";
-import axios from 'axios';
 import jwt from 'jsonwebtoken';
 
 import { User } from "../models/User";
@@ -70,11 +70,10 @@ router.get("/google/callback",
   googleLogin
 );
 
-router.get("/steam", passport.authenticate("steam"));
-router.get(
-  "/steam/callback",
-  passport.authenticate("steam", { failureRedirect: "/login" }),
-  steamLogin
-);
+
+
+// Endpoint to receive user data
+router.post('/steam/login', steamLogin);
+
 
 export default router;

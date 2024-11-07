@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 interface IUserMethods {
   comparePassword(enteredPassword: string): Promise<boolean>;
   getSignedJwtToken(): string;
-}
+} 
 
 // Extend the IUser interface to include the methods
 export interface IUser extends Document, IUserMethods {

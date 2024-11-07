@@ -30,33 +30,8 @@ passport.use(
   )
 );
 
-passport.use(
-  new SteamStrategy(
-    {
-      returnURL: "http://localhost:5500/auth/steam/callback",
-      realm: "http://localhost:3000/",
-      apiKey: keys.steamAPIKey,
-    },
-    async (identifier, profile, done) => {
-      try {
-        let user = await User.findOne({ steamId: profile.id });
-        if (!user) {
-          user = await User.create({
-            steamId: profile.id,
-            fullname: profile.displayName,
-            email: `${profile.id}@steamcommunity.com`, // Steam doesn't provide email, so we create a placeholder
-          });
-        }
-        done(null, user);
-      } catch (error) {
-        done(error, null);
-      }
-    }
-  )
-);
-
 passport.serializeUser((user: IUser, done: any) => {
-  done(null, user._id);
+  done(null, user);
 });
 
 passport.deserializeUser(async (id: string, done: any) => {

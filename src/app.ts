@@ -87,7 +87,6 @@ cron.schedule('0 0 * * *', () => {
   });
 });
 
-
 const port = process.env.PORT || 5500;
 server.listen(port, () => {
   console.log(`server is running at http://localhost:${port}`);
