@@ -10,8 +10,6 @@ const sendToken = (user: IUser, statusCode: number, res: Response) => {
     httpOnly: true, // Accessible only by web server
   };
 
-  console.log(user);
-
   res
     .status(statusCode)
     .cookie("token", token, options)

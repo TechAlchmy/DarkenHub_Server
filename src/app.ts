@@ -54,12 +54,12 @@ const io = new Server(server, {
 });
 
 io.on('connection', (socket) => {
-  console.log('A user connected');
+  // console.log('A user connected');
 
   // Join a specific room
   socket.on('joinRoom', (roomId) => {
     socket.join(roomId);
-    console.log(`User joined room: ${roomId}`);
+    // console.log(`User joined room: ${roomId}`);
 
     // Send existing messages in the room to the new user
     Message.find({ roomId: roomId }).then((messages) => {

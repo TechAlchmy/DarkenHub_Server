@@ -7,7 +7,7 @@ import {
 import express, { Request, Response, NextFunction } from "express";
 const OpenID = require('openid').OpenID;
 import passport from "passport";
-import { OAuth2Client } from "google-auth-library";
+import { OAuth2Client } from "google-auth-library"; 
 import jwt from 'jsonwebtoken';
 
 import { User } from "../models/User";
@@ -74,6 +74,5 @@ router.get("/google/callback",
 
 // Endpoint to receive user data
 router.post('/steam/login', steamLogin);
-
 
 export default router;

@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import sendToken from "../utils/sendToken";
 import { User } from "../models/User";
 import { IUser } from "../models/schemas/UserSchema";
+import { dota2ItemSave } from "./dota2ItemController";
 require('dotenv').config();
 
 export const registerUser = async (
@@ -40,7 +41,7 @@ export const googleLogin = (
     token,
     user: req.user,
   });
-  let redirectUrl = "http://localhost:5173";
+  let redirectUrl = `${process.env.BASE_URL}`;
   if (req.query.state) {
     try {
       const stateData = JSON.parse(
@@ -65,19 +66,49 @@ export const googleLogin = (
   `);
 };
 
+const fetchSteamUserData = async (steamID: any) => {
+  const apiKey = `${process.env.STEAM_APIKEY}`; // Replace with your Steam API key
+  const url = `https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${apiKey}&steamids=${steamID}`;
+
+  try {
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.response.players.length > 0) {
+          const player = data.response.players[0];
+          const userData = {
+            username: player.personaname,
+          };
+          return userData;
+      } else {
+          console.log('No player found with this Steam ID');
+          return null;
+      }
+  } catch (error) {
+      console.error('Error fetching Steam user data:', error);
+  }
+};
 
 
 export const steamLogin = async (req: Request, res: Response, next: NextFunction) => {
-  const userData = req.body;
-
-  const { steamID } = req.body;
-  let user = await User.findOne({ steamID: steamID});
+  const steamID = req.body.steamId;
+  let user = await User.findOne({ steamId: steamID }) || await User.findOne({ email: `${steamID}@steam.com` });
   if (!user) {
+    const userData = await fetchSteamUserData(steamID);
     // Create a new user if they don't exist
-    user = await User.create({
-      steamId: steamID,
-      // Add any additional fields you need
-    });
+    if (userData) {
+      // Create a new user only if userData is valid
+      user = await User.create({  
+        steamId: steamID,
+        fullname: userData.username,
+        email: `${steamID}@steam.com`,
+      });
+    }
+
+    dota2ItemSave(steamID);
+    
+  }else{
+    console.log('User already exists');
   }
 
   sendToken(user, 200, res); // Send JWT to frontend
