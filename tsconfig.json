@@ -6,6 +6,9 @@
         "outDir": "dist",
         "sourceMap": true,
         "noImplicitAny": true,
+        "skipLibCheck": true
     },
-    "include": ["src/**/*"],
+    "include": [
+        "src/**/*"
+    ],
 }
