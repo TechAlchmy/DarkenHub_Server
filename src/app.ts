@@ -39,6 +39,9 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Routes
+app.use("/", (req, res) => {
+  res.send("Hello World!");
+})
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/dota2", dota2Routes);
