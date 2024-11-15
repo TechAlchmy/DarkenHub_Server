@@ -1,6 +1,7 @@
 import mongoose, { Document, Model } from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+require('dotenv').config();
 
 // Define a new interface for the methods
 interface IUserMethods {

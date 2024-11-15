@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 import {
   googleLogin,
   loginUser,
@@ -24,7 +26,7 @@ const generateJwtToken = (payload: { email: string; name: string }) => {
   });
 };
 
-const CLIENT_ID = "88723098646-umubo24i7dvbi6doqfdf24i9cdm980e8.apps.googleusercontent.com"; // Add your Google Client ID to your .env
+const CLIENT_ID = process.env.GOOGLE_CLIENT_ID; // Add your Google Client ID to your .env
 const client = new OAuth2Client(CLIENT_ID);
 
 router.post("/google", async (req: any, res: any) => {
