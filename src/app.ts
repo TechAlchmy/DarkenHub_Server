@@ -54,7 +54,10 @@ const io = new Server(server, {
 
 socketHandler(io);
 
-const port = process.env.PORT || 5500;
-server.listen(port, () => {
-  console.log(`server is running at http://localhost:${port}`);
-});
+// const port = process.env.PORT || 5500;
+// server.listen(port, () => {
+//   console.log(`server is running at http://localhost:${port}`);
+// });
+
+
+export default app
