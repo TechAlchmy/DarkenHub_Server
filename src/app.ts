@@ -31,8 +31,14 @@ app.use(
     saveUninitialized: false,
   })
 );
+const corsOptions = {
+  origin: 'https://darken-hub-sigma.vercel.app', // Allow your frontend origin
+  methods: ['GET', 'POST', 'OPTIONS'], // Allowed HTTP methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+};
+app.use(cors(corsOptions));
 
-app.use(cors());
+
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(passport.initialize());
