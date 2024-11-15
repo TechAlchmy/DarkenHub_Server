@@ -31,13 +31,11 @@ app.use(
     saveUninitialized: false,
   })
 );
-const corsOptions = {
-  origin: 'https://darken-hub-sigma.vercel.app', // Allow your frontend origin
-  methods: ['GET', 'POST', 'OPTIONS'], // Allowed HTTP methods
-  allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
-};
-app.use(cors(corsOptions));
-
+app.use(cors({
+  origin: 'https://darken-hub-sigma.vercel.app', // Allow only this origin
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify the allowed methods
+  credentials: true // Allow cookies to be sent
+}));
 
 app.use(bodyParser.json());
 app.use(cookieParser());
