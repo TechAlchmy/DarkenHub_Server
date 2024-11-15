@@ -70,8 +70,6 @@ router.get("/google/callback",
   googleLogin
 );
 
-
-
 // Endpoint to receive user data
 router.post('/steam/login', steamLogin);
 

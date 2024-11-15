@@ -7,7 +7,9 @@ interface IItemMethods {
 
 // Extend the IItem interface to include the methods
 export interface IItem extends Document, IItemMethods {
+  id: string;
   itemName: string;
+  iconUrl: string;
   rarity: string;    // e.g., 'common', 'rare', 'epic', 'legendary'
   quality: string;   // e.g., 'low', 'medium', 'high'
   type: string;      // e.g., 'weapon', 'armor', 'accessory'
@@ -20,7 +22,9 @@ export type ItemModel = Model<IItem, {}, IItemMethods>;
 
 export const ItemSchema = new mongoose.Schema(
   {
+    id: { type: String, required: true },
     itemName: { type: String, required: true },
+    iconUrl: { type: String },
     rarity: { type: String, required: true },
     quality: { type: String, required: true },
     type: { type: String, required: true },

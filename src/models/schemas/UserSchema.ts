@@ -11,6 +11,7 @@ interface IUserMethods {
 // Extend the IUser interface to include the methods
 export interface IUser extends Document, IUserMethods {
   fullname: string;
+  userID: string;
   email: string;
   password?: string;
   googleId?: string;
@@ -23,6 +24,7 @@ export type UserModel = Model<IUser, {}, IUserMethods>;
 export const UserSchema = new mongoose.Schema(
   {
     fullname: { type: String, required: true },
+    userID: {type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, select: false },
     googleId: { type: String, sparse: true, unique: true },

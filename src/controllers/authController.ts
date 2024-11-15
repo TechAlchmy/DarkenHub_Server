@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from "express";
+
 import sendToken from "../utils/sendToken";
 import { User } from "../models/User";
 import { IUser } from "../models/schemas/UserSchema";
-import { dota2ItemSave } from "./dota2ItemController";
+import { dota2ItemSave } from "./dota2Controller";
+
 require('dotenv').config();
 
 export const registerUser = async (
@@ -10,8 +12,8 @@ export const registerUser = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { fullname, email, password } = req.body;
-  const user = await User.create({ fullname, email, password });
+  const { fullname, userID, email, password } = req.body;
+  const user = await User.create({ fullname, userID, email, password });
   sendToken(user, 200, res);
 };
 
@@ -98,18 +100,16 @@ export const steamLogin = async (req: Request, res: Response, next: NextFunction
     // Create a new user if they don't exist
     if (userData) {
       // Create a new user only if userData is valid
-      user = await User.create({  
+      user = await User.create({
         steamId: steamID,
+        userID: steamID,
         fullname: userData.username,
         email: `${steamID}@steam.com`,
       });
     }
-
     dota2ItemSave(steamID);
-    
   }else{
     console.log('User already exists');
   }
-
   sendToken(user, 200, res); // Send JWT to frontend
 };
